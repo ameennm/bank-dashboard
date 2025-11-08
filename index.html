@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xehedge Funds - Dashboard</title>
+
+    <style>
+        /* --- General Styles --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* --- Login Page Styles --- */
+        #login-page {
+            background-color: #ffffff;
+            padding: 2.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+
+        #login-page h2 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        #login-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #login-form label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+
+        #login-form input {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        #login-form button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0.85rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #login-form button:hover {
+            background-color: #0056b3;
+        }
+
+        #login-error {
+            color: #d93025;
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        /* --- Dashboard Page Styles --- */
+        #dashboard-page {
+            display: none; /* Hidden by default */
+            width: 100%;
+            max-width: 450px; /* Mobile-first width */
+            background-color: #ffffff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: max-width 0.3s ease;
+        }
+
+        .dashboard-header {
+            padding: 1.5rem;
+            padding-bottom: 0;
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        main {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Card */
+        .card-container {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1.5rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .card-chip {
+            width: 45px;
+            height: 35px;
+            background: linear-gradient(135deg, #d4af37 0%, #f7e8aa 100%);
+            border-radius: 6px;
+        }
+
+        .card-logo {
+            font-size: 1.75rem;
+            font-weight: bold;
+            font-style: italic;
+        }
+        .card-logo span {
+            font-weight: 300;
+        }
+
+        .card-body {
+            margin-top: 2rem;
+        }
+
+        .card-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .card-id {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1rem;
+            color: #bbb;
+            margin-top: 0.25rem;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 1rem;
+            font-family: 'Courier New', Courier, monospace;
+            text-align: right;
+        }
+        .card-footer .label {
+            font-size: 0.6rem;
+            color: #aaa;
+            display: block;
+        }
+        .card-footer .date {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Funds */
+        .funds-container {
+            text-align: center;
+            padding: 1rem 1.5rem 2rem 1.5rem;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+
+        .funds-container h3 {
+            margin: 0;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .funds-icon {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            margin: 0.5rem 0;
+        }
+
+        .funds-amount {
+            font-size: 2.75rem;
+            font-weight: 700;
+            color: #b71c1c;
+            line-height: 1.2;
+        }
+
+        .funds-currency {
+            font-size: 1rem;
+            color: #777;
+            font-weight: 500;
+        }
+
+        /* Actions */
+        .actions-container {
+            padding: 1.5rem;
+        }
+
+        .actions-container h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .actions-grid {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        
+        .action-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .action-icon {
+            font-size: 1.5rem;
+            background-color: #f0f2f5;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            color: #007bff;
+        }
+
+        .action-button span {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #555;
+        }
+
+        /* Transactions */
+        .transactions-container {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+        }
+
+        .transactions-container h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .transaction-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-details .description {
+            font-weight: 600;
+            color: #333;
+        }
+        .transaction-details .date {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .transaction-amount {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .transaction-amount.positive {
+            color: #2e7d32;
+        }
+        .transaction-amount.negative {
+            color: #b71c1c;
+        }
+
+        /* Footer */
+        .dashboard-footer {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: #f9f9f9;
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        /* *********************************
+         *** RESPONSIVE STYLES (DESKTOP) ***
+         *********************************
+        */
+        @media (min-width: 800px) {
+            #dashboard-page {
+                max-width: 960px; /* Wider layout for desktop */
+            }
+
+            .dashboard-header {
+                padding-left: 1.5rem;
+            }
+
+            main {
+                display: grid;
+                grid-template-columns: 1fr 1.2fr; /* 2-column layout */
+                grid-template-rows: auto 1fr;   /* Define rows */
+                gap: 0 1.5rem;                /* Gap between columns */
+                padding: 0 1.5rem;              /* Side padding */
+            }
+
+            /* Place grid items */
+            .card-container {
+                grid-column: 1 / 2;
+                grid-row: 1 / 2;
+                margin: 1.5rem 0; /* Adjust margin for grid */
+            }
+            .funds-container {
+                grid-column: 1 / 2;
+                grid-row: 2 / 3;
+                border-bottom: none; /* Remove bottom border in 2-col layout */
+            }
+            .actions-container {
+                grid-column: 2 / 3;
+                grid-row: 1 / 2;
+                padding: 1.5rem 0; /* Adjust padding */
+            }
+            .transactions-container {
+                grid-column: 2 / 3;
+                grid-row: 2 / 3;
+                padding: 0 0 1.5rem 0; /* Adjust padding */
+            }
+
+            .dashboard-footer {
+                grid-column: 1 / 3; /* Make footer span both columns */
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="login-page">
+        <h2>Welcome to Xehedge</h2>
+        <form id="login-form">
+            <label for="email">Email</label>
+            <input type="email" id="email" required placeholder="Enter your email">
+            
+            <label for="password">Password</label>
+            <input type="password" id="password" required placeholder="Enter your password">
+            
+            <button type="submit">Login</button>
+            <p id="login-error"></p>
+        </form>
+    </div>
+
+    <div id="dashboard-page">
+        
+        <header class="dashboard-header">
+            Good Afternoon, <strong>BEENA!</strong>
+        </header>
+
+        <main>
+            <div class="card-container">
+                <div class="card-header">
+                    <div class="card-chip"></div>
+                    <div class="card-logo">xeh <span>funds</span></div>
+                </div>
+                <div class="card-body">
+                    <div class="card-name">BEENA PK</div>
+                    <div class="card-id">ID - XEH00034</div>
+                </div>
+                <div class="card-footer">
+                    <div>
+                        <span class="label">VALID THRU</span>
+                        <span class="date">12/29</span>
+                    </div>
+                </div>
+            </div>
+
+            <section class="funds-container">
+                <h3>Available Funds</h3>
+                <div class="funds-icon">$</div>
+                <div class="funds-amount">1,755,398.14</div>
+                <div class="funds-currency">USD Fiat</div>
+            </section>
+
+            <section class="actions-container">
+                <h3>Quick Actions</h3>
+                <div class="actions-grid">
+                    <div class="action-button">
+                        <div class="action-icon">&#128178;</div>
+                        <span>Send Money</span>
+                    </div>
+                    <div class="action-button">
+                        <div class="action-icon">&#128180;</div>
+                        <span>Request</span>
+                    </div>
+                    <div class="action-button">
+                        <div class="action-icon">&#128190;</div>
+                        <span>Pay Bills</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="transactions-container">
+                <h3>Recent Transactions</h3>
+                <ul class="transaction-list">
+                    <li class="transaction-item">
+                        <div class="transaction-details">
+                            <div class="description">Spotify Subscription</div>
+                            <div class="date">Nov 07, 2025</div>
+                        </div>
+                        <div class="transaction-amount negative">-$9.99</div>
+                    </li>
+                    <li class="transaction-item">
+                        <div class="transaction-details">
+                            <div class="description">Salary Deposit</div>
+                            <div class="date">Nov 05, 2025</div>
+                        </div>
+                        <div class="transaction-amount positive">+$4,200.00</div>
+                    </li>
+                    <li class="transaction-item">
+                        <div class="transaction-details">
+                            <div class="description">Starbucks Coffee</div>
+                            <div class="date">Nov 04, 2025</div>
+                        </div>
+                        <div class="transaction-amount negative">-$5.75</div>
+                    </li>
+                     <li class="transaction-item">
+                        <div class="transaction-details">
+                            <div class="description">Amazon Purchase</div>
+                            <div class="date">Nov 03, 2025</div>
+                        </div>
+                        <div class="transaction-amount negative">-$124.50</div>
+                    </li>
+                </ul>
+            </section>
+        </main>
+
+        <footer class="dashboard-footer">
+            2025 © Xehedge Funds
+        </footer>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            const loginForm = document.getElementById('login-form');
+            const loginPage = document.getElementById('login-page');
+            const dashboardPage = document.getElementById('dashboard-page');
+            const loginError = document.getElementById('login-error');
+
+            loginForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                // Get the values the user typed in
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                // Check the user's input against the hardcoded credentials
+                if (email === 'Muha@gmail.com' && password === '123456') {
+                    loginPage.style.display = 'none';
+                    dashboardPage.style.display = 'block'; // Show the dashboard
+                    document.body.style.alignItems = 'flex-start'; 
+                } else {
+                    // Show an error if the input is wrong
+                    loginError.textContent = 'Invalid email or password. Please try again.';
+                    loginError.style.display = 'block';
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
