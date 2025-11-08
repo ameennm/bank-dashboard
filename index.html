@@ -471,17 +471,21 @@
             loginForm.addEventListener('submit', function(event) {
                 event.preventDefault();
 
-                // Get the values the user typed in
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('password').value;
 
-                // Check the user's input against the hardcoded credentials
-                if (email === 'Muha@gmail.com' && password === '123456') {
+                // *** THIS IS THE UPDATED LINE ***
+                // We convert the user's email input to lowercase before checking it.
+                // 'muha@gmail.com' is the all-lowercase version of the correct email.
+                if (email.toLowerCase() === 'muha@gmail.com' && password === '123456') {
+                    
+                    // Successful login
                     loginPage.style.display = 'none';
-                    dashboardPage.style.display = 'block'; // Show the dashboard
+                    dashboardPage.style.display = 'block';
                     document.body.style.alignItems = 'flex-start'; 
+                
                 } else {
-                    // Show an error if the input is wrong
+                    // Failed login
                     loginError.textContent = 'Invalid email or password. Please try again.';
                     loginError.style.display = 'block';
                 }
